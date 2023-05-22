@@ -1,0 +1,16 @@
+pytorch_lightning==1.7.0
+streamlit
+torch 
+numpy 
+sklearn 
+pytorch_msssim 
+monai 
+torchmetrics 
+torch-fidelity 
+torchio 
+pillow 
+einops 
+torchvision 
+matplotlib 
+pandas 
+lpips

@@ -1,6 +1,7 @@
 # Checkpoints and datasets
 *.ckpt
 generated_datasets/
+*.pem
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

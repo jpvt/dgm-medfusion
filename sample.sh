@@ -9,22 +9,15 @@ NC='\033[0m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 
-AUTOENCODER_CHECKPOINT="$1"
-PIPELINE_CHECKPOINT="$2"
-OUTPUT_PATH="$3"
-STEPS="$4"
-SEED="$5"
-BATCH_SIZE="$6"
-DATASET_SIZE="$7"
-NUM_WORKERS="$8"
-
-# Check if all arguments were passed
-if [ "$#" -ne 8 ]; then
-    echo -e "${RED}Warning: Illegal number of parameters. Please pass all arguments.${NC}"
-    echo -e "Usage: $0 <autoencoder_checkpoint> <pipeline_checkpoint> <output_path> <steps> <seed> <batch_size> <dataset_size> <num_workers>"
-    exit 1
-fi
-
+# Arguments
+AUTOENCODER_CHECKPOINT="project/model_checkpoints/vae.ckpt"
+PIPELINE_CHECKPOINT="project/model_checkpoints/pipeline.ckpt"
+OUTPUT_PATH="project/generated_datasets/"
+STEPS="300"
+SEED="0"
+BATCH_SIZE="20"
+DATASET_SIZE="10000"
+NUM_WORKERS="4"
 
 # Setup Environment
 echo -e "${GREEN}Setting up environment...${NC}"

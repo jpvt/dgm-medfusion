@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 import torch
 import math
@@ -8,16 +9,30 @@ import time
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
+# ------------ ArgParse ------------
+parser = argparse.ArgumentParser(conflict_handler='resolve')
+parser.add_argument("--ae_ckpt",    type=str,   default='project/model_checkpoints/vae.ckpt', help="Autoencoder weights")
+parser.add_argument("--pip_ckpt",    type=str,   default='project/model_checkpoints/pipeline.ckpt', help="Diffusion Pipeline weights")
+parser.add_argument("--output_dir",    type=str,   default='project/generated_datasets/', help="Generated Datasets output directory")
+parser.add_argument("--steps",    type=int,   default=300, help="Number of steps for sampling")
+parser.add_argument("--seed",    type=int,   default=0, help="Random seed")
+parser.add_argument("--batch_size",    type=int,   default=5, help="Batch size")
+parser.add_argument("--dataset_size",    type=int,   default=10, help="Number of samples to generate")
+parser.add_argument("--num_workers",    type=int,   default=4, help="Number of workers for dataloader")
+args = parser.parse_args()
+# --------------------------------
+
 # ------------ Config ------------
-AUTOENCODER_CHECKPOINT = 'model_checkpoints/vae.ckpt'
-PIPELINE_CHECKPOINT = 'model_checkpoints/pipeline.ckpt'
-OUTPUT_PATH = 'generated_datasets/'
-STEPS = 300
-SEED = 0
-BATCH_SIZE = 5
-DATASET_SIZE = 100
-NUM_WORKERS = 4
+AUTOENCODER_CHECKPOINT = args.ae_ckpt
+PIPELINE_CHECKPOINT = args.pip_ckpt
+OUTPUT_PATH = args.output_dir
+STEPS = args.steps
+SEED = args.seed
+BATCH_SIZE = args.batch_size
+DATASET_SIZE = args.dataset_size
+NUM_WORKERS = args.num_workers
 LATENT_DIM_SHAPE = (8, 64, 64)
+# --------------------------------
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""

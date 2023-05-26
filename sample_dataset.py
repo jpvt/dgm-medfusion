@@ -16,8 +16,8 @@ parser.add_argument("--pip_ckpt",    type=str,   default='project/model_checkpoi
 parser.add_argument("--output_dir",    type=str,   default='project/generated_datasets/', help="Generated Datasets output directory")
 parser.add_argument("--steps",    type=int,   default=300, help="Number of steps for sampling")
 parser.add_argument("--seed",    type=int,   default=0, help="Random seed")
-parser.add_argument("--batch_size",    type=int,   default=5, help="Batch size")
-parser.add_argument("--dataset_size",    type=int,   default=10, help="Number of samples to generate")
+parser.add_argument("--batch_size",    type=int,   default=20, help="Batch size")
+parser.add_argument("--dataset_size",    type=int,   default=10000, help="Number of samples to generate")
 parser.add_argument("--num_workers",    type=int,   default=4, help="Number of workers for dataloader")
 args = parser.parse_args()
 # --------------------------------
@@ -51,13 +51,12 @@ def sample_chunk(pipeline, n_samples, guidance_scale=1,condition=None, un_cond=N
     return results
 
 # ------------ Load Model ------------
-device = torch.device('cuda')
+device_gpu = torch.device('cuda')
 pipeline = DiffusionPipeline.load_from_checkpoint(
     PIPELINE_CHECKPOINT,
     latent_embedder=VAE,
     latent_embedder_checkpoint=AUTOENCODER_CHECKPOINT
 )
-pipeline.to(device)
 
 if __name__ == "__main__":
     n_samples = DATASET_SIZE
@@ -71,7 +70,9 @@ if __name__ == "__main__":
     start_time_step = time.time()
     for chunk in chunks(list(range(n_samples)), sample_batch):
         start_chunk = time.time()
+        pipeline.to(device_gpu)
         results = sample_chunk(pipeline, len(chunk), steps=STEPS)
+        pipeline.cpu()
         # --------- Save result ----------------
         Parallel(NUM_WORKERS)(
             delayed(save_image_batch)(
@@ -84,7 +85,8 @@ if __name__ == "__main__":
         end_chunk = time.time()
         counter += 1
         print(f"Chunk: {counter} | Time: {end_chunk-start_chunk}")
+        torch.cuda.empty_cache()
+        time.sleep(3)
 
     end_time_step = time.time()
     print(f"Steps: {STEPS} | Total time: {end_time_step-start_time_step}")
-    
